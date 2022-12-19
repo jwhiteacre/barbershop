@@ -8,7 +8,7 @@ import (
 )
 
 const WaitRoomSize = 6
-const NumBarbers   = 1
+const NumBarbers = 1
 
 // Customer struct for defining the customer and the service
 type Customer struct {
@@ -29,7 +29,7 @@ func (b Barber) PerformService(c Customer) {
 // BarberShop struct for holding the waitroom
 type BarberShop struct {
 	waitRoom chan Customer
-	wg sync.WaitGroup
+	wg       sync.WaitGroup
 }
 
 // Puts a customer in the waitroom as long as it is not full
@@ -45,25 +45,25 @@ func (b *BarberShop) AddCustomer(c Customer) error {
 }
 
 // Opens the barbershop
-func (b * BarberShop) Open() {
+func (b *BarberShop) Open() {
 	for i := 0; i < NumBarbers; i++ {
-      b.wg.Add(1)
+		b.wg.Add(1)
 		go func(w Barber, wr *chan Customer, wg *sync.WaitGroup) {
-		   defer wg.Done()
-		   for {
-		      c, ok := <-*wr
-		      if !ok {
-			      fmt.Println("No more customers")
-			    return
-		      }
-		      w.PerformService(c)
-		   }
-      }(Barber{}, &b.waitRoom, &b.wg)
+			defer wg.Done()
+			for {
+				c, ok := <-*wr
+				if !ok {
+					fmt.Println("No more customers")
+					return
+				}
+				w.PerformService(c)
+			}
+		}(Barber{}, &b.waitRoom, &b.wg)
 	}
 }
 
 // Closes the barbershop
-func (b * BarberShop) Close() {
+func (b *BarberShop) Close() {
 	close(b.waitRoom)
 
 	fmt.Println("Waiting for last customers")
